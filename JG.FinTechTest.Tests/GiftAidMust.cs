@@ -65,4 +65,5 @@ namespace JG.FinTechTest.Tests
             Assert.Throws<InvalidTaxRateException>(() => new GiftAidService(taxRate));
         }
     }
+
 }

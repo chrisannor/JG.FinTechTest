@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JG.FinTechTest.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace JG.FinTechTest
 {
@@ -26,6 +29,9 @@ namespace JG.FinTechTest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            ConfigureDependencies(services);
+            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo() { Title = "Annor - Just Giving", Version = "v1" }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,6 +41,10 @@ namespace JG.FinTechTest
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Annor - Just Giving"));
 
             app.UseHttpsRedirection();
 
@@ -46,6 +56,11 @@ namespace JG.FinTechTest
             {
                 endpoints.MapControllers();
             });
+        }
+
+        public void ConfigureDependencies(IServiceCollection services)
+        {
+            services.AddSingleton<IGiftAidService>(svc => new GiftAidService(Configuration.GetValue<decimal>("TaxRate")));
         }
     }
 }
